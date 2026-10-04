@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CamMatch</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f4f5f8;--card:#fff;--tx:#14161a;--mu:#6b7280;--ln:#e6e8ee;--ac:#111827;--on:#fff;--ac2:#6366f1;--ok:#16a34a;--r:18px;--sh:0 6px 20px rgba(17,24,39,.07);color-scheme:light}
+:root[data-theme=dark]{--bg:#0d0f14;--card:#171a21;--tx:#f2f4f8;--mu:#9aa3b2;--ln:#262a34;--ac:#f2f4f8;--on:#0d0f14;--ac2:#818cf8;--sh:0 6px 20px rgba(0,0,0,.4);color-scheme:dark}
+@media(prefers-color-scheme:dark){:root[data-theme=auto]{--bg:#0d0f14;--card:#171a21;--tx:#f2f4f8;--mu:#9aa3b2;--ln:#262a34;--ac:#f2f4f8;--on:#0d0f14;--ac2:#818cf8;--sh:0 6px 20px rgba(0,0,0,.4);color-scheme:dark}}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
+#app{width:100%;max-width:760px;min-height:100%;position:relative;padding:env(safe-area-inset-top,0) 0 0}
+@media(min-width:800px){body{padding:20px 0}#app{border-radius:28px;background:var(--bg);box-shadow:0 20px 60px rgba(0,0,0,.18);overflow:hidden;min-height:0;height:calc(100vh - 40px);overflow-y:auto}}
+main{padding:14px 18px calc(92px + env(safe-area-inset-bottom,0));animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+h1{font-size:26px;letter-spacing:-.5px}h2{font-size:17px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;min-height:40px}
+.top h2{flex:1;text-align:center}
+.ib{width:42px;height:42px;border-radius:14px;border:1px solid var(--ln);background:var(--card);color:var(--tx);display:grid;place-items:center;cursor:pointer;position:relative;transition:.15s}
+.ib:active{transform:scale(.92)}
+.bdg{position:absolute;top:-5px;right:-5px;background:var(--ac2);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;font-weight:700}
+.i{width:22px;height:22px}.i.on{fill:currentColor}.i.sm{width:18px;height:18px}
+.sb{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:0 14px;height:48px;margin-bottom:6px}
+.sb input{flex:1;border:0;background:none;color:var(--tx);font:inherit;outline:0;height:100%}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 12px}
+.sec a{color:var(--ac2);font-size:13px;cursor:pointer}
+.car{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -18px;padding:2px 18px 10px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}.car .card{min-width:82%;scroll-snap-align:center}
+@media(min-width:600px){.car .card{min-width:300px}}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cat{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:600;cursor:pointer;transition:.2s}
+.cat:active{transform:scale(.96)}.cat small{color:var(--mu);font-weight:400}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);box-shadow:var(--sh);padding:12px;display:flex;gap:12px;position:relative;cursor:pointer;transition:.2s}
+.card:active{transform:scale(.98)}
+.th{width:104px;flex:none;border-radius:14px;overflow:hidden}.th svg{display:block;width:100%;height:auto}
+.bd{flex:1;min-width:0}.row{display:flex;justify-content:space-between;gap:6px;align-items:flex-start}
+.row b{font-size:15px}.pr{font-weight:800;font-size:17px;margin:2px 0 4px}
+.card ul{list-style:none;padding:0;color:var(--mu);font-size:12.5px;margin-bottom:8px}.card li:before{content:"• "}
+.fv{background:none;border:0;color:var(--mu);cursor:pointer;padding:2px}.fv .on,.fv.on{color:#ef4444}
+.btn{border:0;border-radius:14px;background:var(--ac);color:var(--on);font:inherit;font-weight:600;height:50px;padding:0 20px;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%;transition:.15s}
+.btn:active{transform:scale(.97)}.btn.sm{height:34px;font-size:13px;width:auto;padding:0 14px}
+.btn.ghost{background:none;color:var(--tx);border:1px solid var(--ln)}.btn.ok{background:var(--ok);color:#fff}
+.ring{position:absolute;right:12px;bottom:12px;width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--ac2) calc(var(--p)*1%),var(--ln) 0);display:grid;place-items:center}
+.ring span{width:35px;height:35px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:11px;font-weight:700}
+label{display:block;font-weight:600;margin:16px 0 8px}
+select{width:100%;height:50px;border-radius:14px;border:1px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;padding:0 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:9px 14px;border-radius:99px;border:1px solid var(--ln);background:var(--card);cursor:pointer;font-size:13.5px;transition:.15s}
+.chip.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.hero{border-radius:22px;overflow:hidden;margin-bottom:14px}.hero svg{display:block;width:100%;height:auto;max-height:300px}
+.tag{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--ln);color:var(--mu);margin:0 6px 6px 0}
+.list{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:4px 14px;margin-bottom:10px}
+.li{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}.li:last-child{border:0}
+.li .i{color:var(--ac2);flex:none}.li small{margin-left:auto;color:var(--mu)}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:760px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0));display:flex;gap:10px;background:linear-gradient(transparent,var(--bg) 30%);z-index:5}
+.bar .ib{flex:none;width:50px;height:50px}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:760px;display:flex;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0));z-index:6}
+nav button{flex:1;border:0;background:none;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;font-size:11.5px;padding:6px;cursor:pointer;transition:.2s}
+nav button.on{color:var(--tx);font-weight:700}nav button.on .i{transform:translateY(-2px) scale(1.12);color:var(--ac2)}
+@media(min-width:800px){nav,.bar{bottom:20px;max-width:760px;border-radius:0 0 28px 28px}}
+.cmp{overflow-x:auto;border:1px solid var(--ln);border-radius:var(--r);background:var(--card)}
+.cmp table{border-collapse:collapse;width:100%;min-width:100%;font-size:13px}
+.cmp th,.cmp td{padding:11px 10px;border-bottom:1px solid var(--ln);text-align:center;min-width:104px}
+.cmp td:first-child,.cmp th:first-child{text-align:left;color:var(--mu);position:sticky;left:0;background:var(--card);min-width:78px}
+.cmp td.best{color:var(--ok);font-weight:800}.cmp th{vertical-align:top;font-weight:600}.cmp th .ph{width:90px;margin:0 auto 4px;border-radius:10px}.ph{position:relative;overflow:hidden}.ph svg{display:block;width:100%;height:auto}.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
+.net{position:sticky;top:0;z-index:9;background:#f59e0b;color:#1a1200;text-align:center;font-size:13px;font-weight:600;padding:6px;display:none;align-items:center;justify-content:center;gap:6px}
+.net.show{display:flex}
+.empty{text-align:center;color:var(--mu);padding:50px 20px}.empty .i{width:56px;height:56px;opacity:.5;margin-bottom:10px}
+.seg{display:flex;background:var(--ln);border-radius:12px;padding:3px}.seg button{flex:1;border:0;background:none;color:var(--tx);height:36px;border-radius:10px;font:inherit;cursor:pointer}.seg .on{background:var(--card);box-shadow:var(--sh);font-weight:700}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:12px;padding:4px 10px;border-radius:99px;background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok);font-weight:600}.pill.off{background:#f59e0b26;color:#d97706}
+#splash{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;text-align:center;z-index:99;transition:opacity .5s,visibility .5s}
+#splash.hide{opacity:0;visibility:hidden}#splash svg{width:96px;animation:pop .8s ease}#splash h1{font-size:38px;margin-top:8px}#splash p{color:var(--mu)}
+@keyframes pop{from{transform:scale(.4) rotate(-12deg);opacity:0}}
+#toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,30px);background:var(--ac);color:var(--on);padding:10px 18px;border-radius:99px;font-size:13.5px;opacity:0;transition:.3s;z-index:20;pointer-events:none;white-space:nowrap}#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="splash"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.8"/></svg><h1>CamMatch</h1><p>Find Your Perfect Camera</p></div></div>
+<div id="app"><div id="net" class="net"></div><main id="v"></main><nav id="nav"></nav></div>
+<div id="toast"></div>
+<script>
+// ---------- DATA (sample specs & prices, USD) ----------
+const D=[
+{id:1,n:'Sony Alpha A6400',b:'Sony',t:'Mirrorless',p:699,mp:24.2,s:'APS-C',v:'4K UHD',iso:'100 – 32000',fps:11,bat:'Up to 410 shots',w:403,pur:['Travel','Vlogging','Everyday'],f:['Fast Autofocus (Real-time Eye AF)','Flip-up Touchscreen','Wi-Fi & Bluetooth']},
+{id:2,n:'Canon EOS R50',b:'Canon',t:'Mirrorless',p:649,mp:24.2,s:'APS-C',v:'4K UHD',iso:'100 – 32000',fps:12,bat:'Up to 440 shots',w:375,pur:['School projects','Everyday','Travel','Vlogging'],f:['Subject-tracking Autofocus','Vari-angle Touchscreen','Wi-Fi & Bluetooth']},
+{id:3,n:'Fujifilm X-S10',b:'Fujifilm',t:'Mirrorless',p:899,mp:26.1,s:'APS-C',v:'4K UHD',iso:'160 – 12800',fps:8,bat:'Up to 325 shots',w:465,pur:['Travel','Vlogging','Everyday'],f:['In-Body Image Stabilization','Film Simulation Modes','Wi-Fi & Bluetooth']},
+{id:4,n:'Canon EOS R10',b:'Canon',t:'Mirrorless',p:979,mp:24.2,s:'APS-C',v:'4K UHD',iso:'100 – 32000',fps:23,bat:'Up to 430 shots',w:429,pur:['Sports','Travel'],f:['23 fps Electronic Shutter','Animal & Vehicle Tracking','Wi-Fi & Bluetooth']},
+{id:5,n:'Canon EOS Rebel T7',b:'Canon',t:'DSLR',p:479,mp:24.1,s:'APS-C',v:'1080p Full HD',iso:'100 – 6400',fps:3,bat:'Up to 600 shots',w:475,pur:['School projects','Everyday'],f:['Beginner Guided Menu','Optical Viewfinder','Wi-Fi & NFC']},
+{id:6,n:'Nikon D3500',b:'Nikon',t:'DSLR',p:499,mp:24.2,s:'APS-C',v:'1080p Full HD',iso:'100 – 25600',fps:5,bat:'Up to 1550 shots',w:365,pur:['School projects','Everyday','Travel'],f:['Guide Mode for Beginners','Long Battery Life','Bluetooth SnapBridge']},
+{id:7,n:'Nikon D7500',b:'Nikon',t:'DSLR',p:1199,mp:20.9,s:'APS-C',v:'4K UHD',iso:'100 – 51200',fps:8,bat:'Up to 950 shots',w:720,pur:['Sports','Travel'],f:['51-point Autofocus','Weather-sealed Body','Tilting Touchscreen']},
+{id:8,n:'GoPro HERO12 Black',b:'GoPro',t:'Action',p:399,mp:27,s:'1/1.9"',v:'5.3K Video',iso:'100 – 6400',fps:30,bat:'Up to 70 min video',w:154,pur:['Sports','Travel','Vlogging'],f:['Waterproof to 10 m','HyperSmooth Stabilization','Wi-Fi & Bluetooth']},
+{id:9,n:'DJI Osmo Action 4',b:'DJI',t:'Action',p:299,mp:12,s:'1/1.3"',v:'4K / 120 fps',iso:'100 – 12800',fps:30,bat:'Up to 160 min video',w:145,pur:['Sports','Travel'],f:['Waterproof to 18 m','RockSteady Stabilization','Dual Screens']},
+{id:10,n:'Sony ZV-1',b:'Sony',t:'Compact',p:749,mp:20.1,s:'1" Type',v:'4K UHD',iso:'125 – 12800',fps:24,bat:'Up to 260 shots',w:294,pur:['Vlogging','Travel'],f:['Product Showcase Mode','Directional 3-capsule Mic','Flip-out Touchscreen']},
+{id:11,n:'Canon PowerShot G7 X III',b:'Canon',t:'Compact',p:749,mp:20.1,s:'1" Type',v:'4K UHD',iso:'125 – 12800',fps:30,bat:'Up to 235 shots',w:304,pur:['Vlogging','Everyday','Travel'],f:['YouTube Live Streaming','Tilting Touchscreen','Wi-Fi & Bluetooth']},
+{id:12,n:'Panasonic Lumix ZS99',b:'Panasonic',t:'Compact',p:449,mp:20.3,s:'1/2.3"',v:'4K UHD',iso:'80 – 6400',fps:10,bat:'Up to 380 shots',w:340,pur:['Travel','Everyday','School projects'],f:['30x Optical Zoom','Electronic Viewfinder','Wi-Fi & Bluetooth']}];
+const PU={T:'Travel',S:'School projects',V:'Vlogging',P:'Sports',E:'Everyday'};
+const A=(n,b,t,p,mp,s,v,iso,fps,bat,w,pu,f)=>D.push({id:D.length+1,n,b,t,p,mp,s,v,iso,fps,bat,w,pur:[...pu].map(x=>PU[x]),f:f.split('|')});
+A('Sony Alpha A7 IV','Sony','Mirrorless',2499,33,'Full-frame','4K UHD','100 – 51200',10,'Up to 580 shots',658,'TVP','Real-time Tracking AF|5-axis Stabilization|Vari-angle Touchscreen');
+A('Sony ZV-E10','Sony','Mirrorless',699,24.2,'APS-C','4K UHD','100 – 32000',11,'Up to 440 shots',343,'VE','Product Showcase Mode|Directional Mic|Vari-angle Screen');
+A('Sony Alpha A7 III','Sony','Mirrorless',1999,24.2,'Full-frame','4K UHD','100 – 51200',10,'Up to 710 shots',650,'TP','693-point Autofocus|5-axis Stabilization|Dual Card Slots');
+A('Canon EOS R6 Mark II','Canon','Mirrorless',2499,24.2,'Full-frame','4K UHD','100 – 102400',40,'Up to 580 shots',670,'PT','40 fps Electronic Shutter|Subject Detection AF|Dual Card Slots');
+A('Canon EOS M50 Mark II','Canon','Mirrorless',599,24.1,'APS-C','4K UHD','100 – 25600',10,'Up to 305 shots',387,'VES','Eye Detection AF|Vertical Video Support|Vari-angle Touchscreen');
+A('Canon EOS 90D','Canon','DSLR',1199,32.5,'APS-C','4K UHD','100 – 25600',10,'Up to 1300 shots',701,'PT','Optical Viewfinder|Long Battery Life|Vari-angle Touchscreen');
+A('Canon EOS Rebel SL3','Canon','DSLR',549,24.1,'APS-C','4K UHD','100 – 25600',5,'Up to 1070 shots',449,'SE','Compact DSLR Body|Dual Pixel AF|Vari-angle Touchscreen');
+A('Nikon Z50','Nikon','Mirrorless',859,20.9,'APS-C','4K UHD','100 – 51200',11,'Up to 320 shots',450,'TE','209-point Hybrid AF|Tilting Touchscreen|Wi-Fi & Bluetooth');
+A('Nikon Z fc','Nikon','Mirrorless',899,20.9,'APS-C','4K UHD','100 – 51200',11,'Up to 300 shots',445,'TE','Retro Design|Vari-angle Touchscreen|Wi-Fi & Bluetooth');
+A('Nikon Z6 II','Nikon','Mirrorless',1999,24.5,'Full-frame','4K UHD','100 – 51200',14,'Up to 410 shots',705,'PT','Dual Processors|In-Body Stabilization|Dual Card Slots');
+A('Nikon D5600','Nikon','DSLR',699,24.2,'APS-C','1080p Full HD','100 – 25600',5,'Up to 970 shots',465,'SE','Vari-angle Touchscreen|Optical Viewfinder|Bluetooth SnapBridge');
+A('Fujifilm X-T30 II','Fujifilm','Mirrorless',899,26.1,'APS-C','4K UHD','160 – 12800',30,'Up to 380 shots',378,'TE','Film Simulations|Tilting Touchscreen|Compact Body');
+A('Fujifilm X-T5','Fujifilm','Mirrorless',1699,40.2,'APS-C','6.2K Video','125 – 12800',15,'Up to 740 shots',557,'TP','In-Body Stabilization|Tilting Touchscreen|Weather-sealed');
+A('Fujifilm X100V','Fujifilm','Compact',1399,26.1,'APS-C','4K UHD','160 – 12800',11,'Up to 350 shots',478,'TE','Fixed 23mm Lens|Hybrid Viewfinder|Weather-resistant');
+A('Panasonic Lumix G7','Panasonic','Mirrorless',497,16,'Micro 4/3','4K UHD','200 – 25600',8,'Up to 330 shots',410,'SV','4K Photo Mode|Flip-out Touchscreen|Wi-Fi');
+A('Panasonic Lumix S5 II','Panasonic','Mirrorless',1999,24.2,'Full-frame','6K Video','100 – 51200',30,'Up to 370 shots',740,'VT','Phase-detect Autofocus|In-Body Stabilization|Active Cooling');
+A('OM System OM-5','OM System','Mirrorless',1199,20.4,'Micro 4/3','4K UHD','200 – 25600',30,'Up to 310 shots',414,'TP','IP53 Weather-sealed|5-axis Stabilization|Vari-angle Touchscreen');
+A('Olympus Tough TG-6','Olympus','Compact',449,12,'1/2.3"','4K UHD','100 – 12800',20,'Up to 340 shots',253,'TSP','Waterproof to 15 m|Shockproof & Crushproof|Microscope Mode');
+A('GoPro HERO11 Black','GoPro','Action',299,27,'1/1.9"','5.3K Video','100 – 6400',30,'Up to 75 min video',154,'PTV','Waterproof to 10 m|HyperSmooth 5.0|Wi-Fi & Bluetooth');
+A('Sony RX100 VII','Sony','Compact',1299,20.1,'1" Type','4K UHD','100 – 12800',20,'Up to 260 shots',302,'TV','Real-time Tracking AF|Pop-up Viewfinder|24-200mm Zoom');
+A('Canon PowerShot SX740 HS','Canon','Compact',399,20.3,'1/2.3"','4K UHD','100 – 3200',10,'Up to 265 shots',299,'TES','40x Optical Zoom|Flip-up Screen|Wi-Fi & Bluetooth');
+A('Ricoh GR III','Ricoh','Compact',899,24.2,'APS-C','1080p Full HD','100 – 102400',4,'Up to 200 shots',257,'TE','Pocketable Body|Fixed 28mm Lens|In-Body Stabilization');
+const TYPES=['DSLR','Mirrorless','Action','Compact'],PURP=['Travel','School projects','Vlogging','Sports','Everyday'],BRANDS=[...new Set(D.map(c=>c.b))];
+const BUD=[['u500','Under $500',0,500],['m','$500 – $800',500,800],['h','$800 – $1,200',800,1200],['x','Above $1,200',1200,1e9]];
+// ---------- STATE & STORAGE ----------
+const K='cammatch.v1';let S={fav:[],cmp:[],pf:{},theme:'auto'};
+try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+let st={v:'home',stack:[],tab:'home',sel:null,res:null,q:'',ready:false,dp:null};
+const $=s=>document.querySelector(s),cam=id=>D.find(c=>c.id==id);
+// ---------- ICONS & ART ----------
+const ic={home:'<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',match:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',heart:'<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',back:'<path d="M15 5l-7 7 7 7"/>',filter:'<path d="M3 5h18l-7 8v6l-4-2v-4z"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.8"/>',check:'<path d="M5 12l5 5 9-10"/>',cmp:'<path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/>',off:'<path d="M2 2l20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 4-2.3M19 12.9a10 10 0 0 0-2-1.5M12 20h.01"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',sensor:'<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M9 10h6v4H9z"/>',vid:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',iso:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',bat:'<rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/>',wt:'<path d="M6 20h12l-2-12H8z"/><circle cx="12" cy="5" r="2"/>'};
+const I=(n,c='')=>`<svg class="i ${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic[n]}</svg>`;
+const COL={DSLR:'#6366f1',Mirrorless:'#0ea5e9',Action:'#f97316',Compact:'#10b981'};
+const BODY={DSLR:'<path d="M18 36h22l4-9h32l4 9h22v34H18z"/>',Mirrorless:'<rect x="16" y="32" width="88" height="38" rx="7"/><rect x="22" y="27" width="22" height="8" rx="3"/>',Action:'<rect x="34" y="24" width="52" height="44" rx="9"/><rect x="40" y="29" width="14" height="8" rx="2" fill="#475569"/>',Compact:'<rect x="18" y="34" width="84" height="34" rx="7"/><rect x="26" y="29" width="16" height="7" rx="2"/>'};
+const LX={DSLR:[60,52,15],Mirrorless:[60,51,15],Action:[60,46,12],Compact:[70,51,13]};
+const svgArt=c=>{const [x,y,r]=LX[c.t],k=COL[c.t];return `<svg viewBox="0 0 120 90"><defs><linearGradient id="g${c.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${k}" stop-opacity=".3"/><stop offset="1" stop-color="${k}" stop-opacity=".06"/></linearGradient></defs><rect width="120" height="90" fill="url(#g${c.id})"/><g fill="#1f2937">${BODY[c.t]}</g><circle cx="${x}" cy="${y}" r="${r}" fill="#0b1220" stroke="#94a3b8" stroke-width="2"/><circle cx="${x}" cy="${y}" r="${r*.55}" fill="${k}" opacity=".85"/><circle cx="${x-r*.2}" cy="${y-r*.25}" r="${r*.16}" fill="#fff" opacity=".8"/></svg>`};
+const slug=c=>c.n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const art=c=>`<div class="ph">${svgArt(c)}<img src="photos/${slug(c)}.jpg" alt="${c.n}" loading="lazy" onerror="this.remove()"></div>`;
+// ---------- MATCHING ----------
+function doMatch(p){const b=BUD.find(x=>x[0]==p.bud);const all=D.map(c=>{let e=0,m=0;
+if(b){m+=40;e+=c.p>=b[2]&&c.p<=b[3]?40:c.p<b[3]*1.12&&c.p>b[2]*.88?18:0}
+if(p.pur){m+=30;e+=c.pur.includes(p.pur)?30:0}
+if(p.type){m+=20;e+=c.t==p.type?20:0}
+if(p.brand){m+=10;e+=c.b==p.brand?10:0}
+return{c,s:m?Math.round(e/m*100):100}}).sort((a,z)=>z.s-a.s||a.c.p-z.c.p);
+let l=all.filter(x=>x.s>=60);return l.length?l:all.slice(0,3)}
+// ---------- VIEWS ----------
+const fv=c=>`<button class="fv" data-act="fav" data-id="${c.id}" aria-label="Favorite">${I('heart',S.fav.includes(c.id)?'on':'')}</button>`;
+const card=(c,s)=>`<article class="card" data-act="open" data-id="${c.id}"><div class="th">${art(c)}</div><div class="bd"><div class="row"><b>${c.n}</b>${fv(c)}</div><div class="pr">$${c.p}</div><ul><li>${c.mp} MP ${c.s}</li><li>${c.v}</li><li>${c.f[0]}</li></ul><button class="btn sm ghost" data-act="open" data-id="${c.id}">View Details</button></div>${s!=null?`<div class="ring" style="--p:${s}"><span>${s}%</span></div>`:''}</article>`;
+const top=(t,r='')=>`<div class="top"><button class="ib" data-act="back" aria-label="Back">${I('back')}</button><h2>${t}</h2>${r||'<span style="width:42px"></span>'}</div>`;
+const cmpBtn=()=>`<button class="ib" data-act="cmp" aria-label="Compare">${I('cmp')}${S.cmp.length?`<span class="bdg">${S.cmp.length}</span>`:''}</button>`;
+const empty=(ic_,t,b)=>`<div class="empty">${I(ic_)}<p>${t}</p>${b?`<br><button class="btn" data-act="tab" data-id="match" style="max-width:240px;margin:auto">${b}</button>`:''}</div>`;
+const sel=(id,l,opts,v,any)=>`<label for="${id}">${l}</label><select id="${id}" data-pf="${id}"><option value="">${any}</option>${opts.map(o=>`<option value="${o[0]}"${o[0]==v?' selected':''}>${o[1]}</option>`).join('')}</select>`;
+const V={
+home:()=>`<div class="top"><h1>CamMatch</h1><div style="display:flex;gap:8px">${cmpBtn()}</div></div>
+<div class="sb">${I('match','sm')}<input id="q" placeholder="Search cameras, brands, or models..." value="${st.q}" autocomplete="off"></div>
+<div id="hl">${homeBody()}</div>`,
+match:()=>`<div class="top"><h1>Match</h1><span class="pill" style="visibility:hidden">.</span></div><p style="color:var(--mu)">Tell us what you need and we'll rank the best cameras for you.</p>
+${sel('bud','Budget',BUD.map(b=>[b[0],b[1]]),S.pf.bud,'Any budget')}${sel('type','Camera Type',TYPES.map(t=>[t,t]),S.pf.type,'Any type')}${sel('pur','Photography Purpose',PURP.map(t=>[t,t]),S.pf.pur,'Any purpose')}${sel('brand','Preferred Brand',BRANDS.map(t=>[t,t]),S.pf.brand,'Any brand')}
+<div style="height:24px"></div><button class="btn" data-act="find">${I('match','sm')} Find My Match</button>`,
+results:()=>{const r=st.res;return top(r.title,`<button class="ib" data-act="sort" aria-label="Sort">${I('filter')}</button>`)+`<p style="color:var(--mu);margin:-4px 0 12px">${r.list.length} result${r.list.length==1?'':'s'} found · sorted by ${r.sort}</p><div class="grid">${r.list.map(x=>card(x.c,r.m?x.s:null)).join('')||empty('cam','No cameras found.')}</div>`},
+details:()=>{const c=cam(st.sel),inC=S.cmp.includes(c.id);return top('Camera Details',fv(c))+`<div class="hero">${art(c)}</div>
+<div class="row"><h1 style="font-size:22px">${c.n}</h1><h1 style="font-size:22px">$${c.p}</h1></div>
+<div style="margin:8px 0 14px"><span class="tag">${c.b}</span><span class="tag">${c.t}</span>${c.pur.map(p=>`<span class="tag">${p}</span>`).join('')}</div>
+<h2 style="margin-bottom:8px">Key Specifications</h2><div class="list">${[['sensor',c.mp+' MP '+c.s+' Sensor'],['vid',c.v],['iso','ISO '+c.iso],['bolt',c.fps+' fps Continuous Shooting'],['bat',c.bat],['wt',c.w+' g']].map(x=>`<div class="li">${I(x[0])}<span>${x[1]}</span></div>`).join('')}</div>
+<h2 style="margin:16px 0 8px">Features</h2><div class="list">${c.f.map(f=>`<div class="li">${I('check')}<span>${f}</span></div>`).join('')}</div>
+<div class="bar"><button class="btn ${inC?'ok':''}" data-act="addc" data-id="${c.id}">${I(inC?'check':'cmp','sm')} ${inC?'Added – View Compare':'Add to Compare'}</button></div>`},
+compare:()=>{const l=S.cmp.map(cam);if(!l.length)return top('Compare Cameras')+empty('cmp','Nothing to compare yet. Open a camera and tap "Add to Compare" (up to 3).','Find Cameras');
+const best=(f,m)=>{const v=l.map(c=>c[f]);return l.length>1?(m>0?Math.max(...v):Math.min(...v)):null};
+const rows=[['Price','p',c=>'$'+c.p,-1],['Type','t',c=>c.t],['Sensor','s',c=>c.s],['Megapixels','mp',c=>c.mp+' MP',1],['Video','v',c=>c.v],['ISO','iso',c=>c.iso],['Burst','fps',c=>c.fps+' fps',1],['Battery','bat',c=>c.bat],['Weight','w',c=>c.w+' g',-1]];
+return top('Compare Cameras',`<button class="ib" data-act="clr" aria-label="Clear">${I('x')}</button>`)+`<div class="cmp"><table><tr><th></th>${l.map(c=>`<th>${art(c)}<br>${c.n}<br><b>$${c.p}</b><br><button class="fv" data-act="rmc" data-id="${c.id}" style="font-size:12px">Remove</button></th>`).join('')}</tr>${rows.map(r=>{const b=r[3]?best(r[1],r[3]):null;return `<tr><td>${r[0]}</td>${l.map(c=>`<td class="${b!=null&&c[r[1]]==b?'best':''}">${r[2](c)}</td>`).join('')}</tr>`}).join('')}</table></div><p style="color:var(--mu);font-size:12.5px;margin-top:10px">Green = best value in that row.</p>`},
+favs:()=>`<div class="top"><h1>Favorites</h1><span></span></div>`+(S.fav.length?`<div class="grid">${S.fav.map(cam).map(c=>card(c)).join('')}</div>`:empty('heart','No favorites yet. Tap the heart on any camera to save it – even offline.','Find a Camera')),
+profile:()=>{const th=['auto','light','dark'];return `<div class="top"><h1>Profile</h1><span></span></div>
+<div class="list"><div class="li"><span>Connection</span><small><span class="pill ${navigator.onLine?'':'off'}">${navigator.onLine?'Online':'Offline'}</span></small></div><div class="li"><span>Offline mode</span><small><span class="pill ${st.ready?'':'off'}">${st.ready?'Ready ✓':'Not cached yet'}</span></small></div></div>
+<label>Theme</label><div class="seg">${th.map(t=>`<button class="${S.theme==t?'on':''}" data-act="theme" data-id="${t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div>
+<label>Your Last Match</label><div class="list"><div class="li"><span>${Object.keys(S.pf).filter(k=>S.pf[k]).map(k=>S.pf[k]).join(' · ')||'No preferences saved yet'}</span></div></div>
+<div class="list"><div class="li"><span>Favorites</span><small>${S.fav.length}</small></div><div class="li"><span>In compare list</span><small>${S.cmp.length}</small></div></div>
+${st.dp?`<button class="btn" data-act="install" style="margin-bottom:10px">Install CamMatch App</button>`:''}
+<button class="btn ghost" data-act="reset">Clear saved data</button>
+<p style="color:var(--mu);font-size:12px;margin-top:16px;text-align:center">CamMatch v1.0 · Prices & specs are approximate sample data.<br>by Dionimar Tumabini · BSIT 3 East</p>`}};
+function homeBody(){if(st.q){const q=st.q.toLowerCase(),l=D.filter(c=>(c.n+c.b+c.t).toLowerCase().includes(q));return `<div class="grid" style="margin-top:14px">${l.map(c=>card(c)).join('')||empty('match','No match for "'+st.q.replace(/</g,'&lt;')+'"')}</div>`}
+return `<div class="sec"><h2>Featured Cameras</h2><a data-act="all">See All</a></div><div class="car">${[1,2,10,8,4].map(i=>card(cam(i))).join('')}</div>
+<div class="sec"><h2>Browse by Category</h2></div><div class="cats">${TYPES.map(t=>`<div class="cat" data-act="cat" data-id="${t}"><svg width="56" viewBox="0 0 120 90" style="border-radius:12px;background:${COL[t]}22"><g fill="#1f2937">${BODY[t]}</g><circle cx="${LX[t][0]}" cy="${LX[t][1]}" r="${LX[t][2]}" fill="${COL[t]}"/></svg>${t}<small>${D.filter(c=>c.t==t).length} models</small></div>`).join('')}</div>`}
+// ---------- ROUTER ----------
+function render(){const t=st.v;$('#v').innerHTML=V[t]();$('#nav').style.display=t=='details'?'none':'flex';
+$('#nav').innerHTML=[['home','Home'],['match','Match'],['favs','Favorites'],['profile','Profile']].map(n=>`<button class="${st.tab==n[0]?'on':''}" data-act="tab" data-id="${n[0]}">${I(n[0]=='favs'?'heart':n[0])}${n[1]}</button>`).join('');
+const q=$('#q');if(q)q.oninput=e=>{st.q=e.target.value.trim();$('#hl').innerHTML=homeBody()}}
+function go(v,o={}){st.stack.push({v:st.v,sel:st.sel,res:st.res,tab:st.tab,q:st.q});Object.assign(st,{v},o);render();scrollTo(0,0);$('#app').scrollTop=0}
+function back(){const p=st.stack.pop();p?Object.assign(st,p):st.v='home';render()}
+function showRes(title,list,m){go('results',{res:{title,list,m,sort:m?'best match':'price (low to high)'}})}
+const toast=m=>{const t=$('#toast');t.textContent=m;t.className='show';clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',1800)};
+// ---------- EVENTS ----------
+document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(!a)return;const id=a.dataset.id,act=a.dataset.act;
+if(act=='tab'){st.stack=[];st.tab=id;st.v=id;st.q='';render();scrollTo(0,0);$('#app').scrollTop=0}
+else if(act=='back')back();
+else if(act=='open')go('details',{sel:+id});
+else if(act=='fav'){const i=S.fav.indexOf(+id);i<0?S.fav.push(+id):S.fav.splice(i,1);save();toast(i<0?'Saved to favorites':'Removed from favorites');
+ if(st.v=='favs'||st.v=='details'||st.v=='results'||st.v=='home'){const y=scrollY;render();scrollTo(0,y)}}
+else if(act=='cat')showRes(id+' Cameras',D.filter(c=>c.t==id).map(c=>({c,s:0})),false);
+else if(act=='all')showRes('All Cameras',D.map(c=>({c,s:0})),false);
+else if(act=='find'){S.pf={};document.querySelectorAll('[data-pf]').forEach(s=>S.pf[s.dataset.pf]=s.value);save();showRes('Camera Match Results',doMatch(S.pf),true)}
+else if(act=='sort'){const r=st.res,o=['best match','price (low to high)','price (high to low)'].filter(x=>r.m||x!='best match'),n=o[(o.indexOf(r.sort)+1)%o.length];r.sort=n;
+ r.list.sort(n=='best match'?(a,z)=>z.s-a.s:n.includes('low to')?(a,z)=>a.c.p-z.c.p:(a,z)=>z.c.p-a.c.p);render()}
+else if(act=='addc'){const i=S.cmp.indexOf(+id);if(i>=0)return go('compare');if(S.cmp.length>=3)return toast('Compare list is full (max 3)');S.cmp.push(+id);save();toast('Added to compare');render()}
+else if(act=='cmp')go('compare');
+else if(act=='rmc'){S.cmp=S.cmp.filter(x=>x!=id);save();render()}
+else if(act=='clr'){S.cmp=[];save();render()}
+else if(act=='theme'){S.theme=id;save();applyTheme();render()}
+else if(act=='reset'){if(confirm('Clear favorites, compare list and preferences?')){S.fav=[];S.cmp=[];S.pf={};save();render();toast('Data cleared')}}
+else if(act=='install'){st.dp.prompt();st.dp=null;render()}});
+const applyTheme=()=>{document.documentElement.dataset.theme=S.theme;document.querySelector('meta[name=theme-color]').content=S.theme=='dark'||(S.theme=='auto'&&matchMedia('(prefers-color-scheme:dark)').matches)?'#0d0f14':'#111827'};
+// ---------- ONLINE / OFFLINE + PWA ----------
+function net(){const n=$('#net'),on=navigator.onLine;n.className='net'+(on?'':' show');n.innerHTML=on?'':I('off','sm')+" You're offline – CamMatch still works";if(st.v=='profile')render()}
+addEventListener('online',()=>{net();toast('Back online')});addEventListener('offline',net);
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();st.dp=e;if(st.v=='profile')render()});
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{st.ready=true;if(st.v=='profile')render()}).catch(()=>{});
+applyTheme();render();net();setTimeout(()=>$('#splash').classList.add('hide'),1300);
+</script>
+</body>
+</html>
